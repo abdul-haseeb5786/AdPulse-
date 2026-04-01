@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { KPICard } from './KPICard';
+import type { Campaign } from '../services/campaignService';
 
 type KPIGridProps = {
-  campaigns: any[];
+  campaigns: Campaign[];
   isLoading: boolean;
 };
 

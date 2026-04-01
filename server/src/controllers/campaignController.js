@@ -12,46 +12,38 @@ const getAll = async (req, res) => {
     const { status, client_id, sort, order, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
-    let query = `
-      SELECT c.*, cl.name as client_name 
-      FROM campaigns c 
-      JOIN clients cl ON c.client_id = cl.id 
-      WHERE c.deleted_at IS NULL
-    `;
+    let whereClause = 'WHERE deleted_at IS NULL';
     const params = [];
 
     if (status) {
       params.push(status);
-      query += ` AND c.status = $${params.length}`;
+      whereClause += ` AND status = $${params.length}`;
     }
 
     if (client_id) {
       params.push(client_id);
-      query += ` AND c.client_id = $${params.length}`;
+      whereClause += ` AND client_id = $${params.length}`;
     }
 
     // Whitelist for sorting to prevent SQL injection
-    const allowedSortFields = ['spend', 'impressions', 'clicks', 'budget', 'created_at'];
+    const allowedSortFields = ['spend', 'impressions', 'clicks', 'budget', 'created_at', 'name'];
     const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
     const sortOrder = order?.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
-    query += ` ORDER BY c.${sortField} ${sortOrder}`;
+    const query = `
+      SELECT c.*, cl.name as client_name 
+      FROM campaigns c 
+      JOIN clients cl ON c.client_id = cl.id 
+      ${whereClause.replace(/(\s)(status|client_id)/g, '$1c.$2')}
+      ORDER BY c.${sortField} ${sortOrder}
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+    `;
     
-    // Pagination
-    params.push(limit, offset);
-    query += ` LIMIT $${params.length - 1} OFFSET $${params.length}`;
-
-    const { rows } = await pool.query(query, params);
+    const { rows } = await pool.query(query, [...params, parseInt(limit), offset]);
     
-    // Total count for pagination
-    const countQuery = 'SELECT COUNT(*) FROM campaigns WHERE deleted_at IS NULL' + 
-      (status ? ' AND status = $1' : '') + 
-      (client_id ? ` AND client_id = $${status ? 2 : 1}` : '');
-    const countParams = [];
-    if (status) countParams.push(status);
-    if (client_id) countParams.push(client_id);
-    
-    const countResult = await pool.query(countQuery, countParams);
+    // Total count for pagination - Reuse where clause logic
+    const countQuery = `SELECT COUNT(*) FROM campaigns ${whereClause}`;
+    const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
 
     const campaigns = rows.map(addMetrics);
@@ -133,10 +125,13 @@ const update = async (req, res) => {
       return res.status(404).json({ error: "Campaign not found" });
     }
 
-    const updates = req.body;
-    delete updates.deleted_at; // Protection
-    delete updates.id;
-    delete updates.created_at;
+    const ALLOWED_UPDATE_FIELDS = ['name','status','budget','spend','impressions','clicks','conversions','revenue','start_date','end_date'];
+    const updates = Object.keys(req.body)
+      .filter(key => ALLOWED_UPDATE_FIELDS.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = req.body[key];
+        return obj;
+      }, {});
 
     const setClauses = [];
     const values = [id];

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCampaigns, type CampaignParams,  } from '../services/campaignService';
+import { getCampaigns, type CampaignParams, type Campaign, type CampaignsResponse } from '../services/campaignService';
 
 export function useCampaigns(initialParams: CampaignParams = {}) {
-  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,12 +13,12 @@ export function useCampaigns(initialParams: CampaignParams = {}) {
     setError(null);
     try {
       const mergedParams = { ...params, ...overrideParams };
-      const data: any = await getCampaigns(mergedParams);
-      // Using .data since typical paginated endpoints wrap inside a data property root
+      const data: CampaignsResponse = await getCampaigns(mergedParams);
       setCampaigns(data.data || []);
       setTotal(data.total || 0);
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching campaigns');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred fetching campaigns';
+      setError(message);
     } finally {
       setIsLoading(false);
     }

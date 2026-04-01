@@ -1,22 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAlerts } from '../../hooks/useAlerts';
-
-type Alert = {
-  id: string;
-  campaign_id: string;
-  campaign_name: string;
-  rule_id: string;
-  metric: string;
-  message: string;
-  current_value: number;
-  threshold_value: number;
-  severity: 'critical' | 'warning' | 'info';
-  is_read: boolean;
-  triggered_at: string;
-};
+import type { Alert } from '../../hooks/useAlerts';
 
 type NotificationCenterProps = {
-  token?: string | null;
   showToast: (message: string, type: 'success' | 'info') => void;
 };
 
@@ -130,7 +116,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ showToas
                       {alert.message}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-[var(--text-muted)]">{alert.campaign_name}</span>
+			  <span className="text-[11px] font-semibold text-[var(--text-muted)]">{alert.campaign_name || 'Campaign'}</span>
                       <span className="text-[10px] text-[var(--text-muted)]">•</span>
                       <span className="text-[11px] text-[var(--text-muted)]">{getTimeAgo(alert.triggered_at)}</span>
                     </div>

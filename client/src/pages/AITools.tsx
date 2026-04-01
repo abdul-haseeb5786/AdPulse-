@@ -11,8 +11,13 @@ const tabs = [
   { key: 'hashtags', label: 'Hashtags', icon: '#' },
 ];
 
+interface AIToolsContext {
+  onMenuToggle: () => void;
+  showToast: (message: string, type?: 'success' | 'info') => void;
+}
+
 export const AITools = () => {
-  const { onMenuToggle, showToast }: any = useOutletContext();
+  const { onMenuToggle, showToast } = useOutletContext<AIToolsContext>();
   const [isDark, toggleDark] = useDarkMode();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'copy';

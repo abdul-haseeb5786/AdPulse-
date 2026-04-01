@@ -11,6 +11,12 @@ const platforms = [
   { value: 'facebook',  label: 'Facebook',    dot: 'bg-indigo-600', limit: 63206 },
 ];
 
+interface SpaceCaption {
+  id?: string;
+  text: string;
+  characterCount?: number;
+}
+
 // Shimmer skeleton for 5 caption cards
 const SkeletonCard = () => (
   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 mb-3 animate-pulse">
@@ -30,7 +36,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-const CaptionCard = ({ caption, index, platform }: { caption: any; index: number; platform: string }) => {
+const CaptionCard = ({ caption, index, platform }: { caption: SpaceCaption; index: number; platform: string }) => {
   const limit = platforms.find(p => p.value === platform)?.limit || 2200;
   const charCount = caption.text?.length || caption.characterCount || 0;
   const isOver = charCount > limit;
@@ -87,7 +93,7 @@ export const SocialGenerator = () => {
     campaign_goal: '',
     brand_voice: '',
   });
-  const [captions, setCaptions] = useState<any[]>([]);
+  const [captions, setCaptions] = useState<SpaceCaption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasGenerated, setHasGenerated] = useState(false);
@@ -114,8 +120,9 @@ export const SocialGenerator = () => {
 
       const data = await res.json();
       setCaptions(data.data.captions || []);
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setIsLoading(false);
     }

@@ -9,6 +9,17 @@ const industries = [
   'Entertainment', 'Sports', 'Other',
 ];
 
+interface Hashtag {
+  tag: string;
+  volume: 'high' | 'medium' | 'niche';
+  relevanceScore: number;
+}
+
+interface HashtagResult {
+  hashtags: Hashtag[];
+  recommendedCombination: string;
+}
+
 // CSS-only 3-segment volume indicator
 const VolumeBar = ({ filled, color }: { filled: number; color: string }) => (
   <div className="flex items-center gap-[2px]">
@@ -56,7 +67,7 @@ const getScoreBadge = (score: string | number) => {
   return { bg: 'var(--bg-subtle)', color: 'var(--text-muted)' };
 };
 
-const HashtagRow = ({ tag }: { tag: any }) => {
+const HashtagRow = ({ tag }: { tag: Hashtag }) => {
   const { copied, copy } = useClipboard();
   const badge = getScoreBadge(tag.relevanceScore);
 
@@ -121,7 +132,7 @@ const SkeletonOutput = () => (
 
 export const HashtagGenerator = () => {
   const [form, setForm] = useState({ content: '', industry: 'Beauty' });
-  const [result, setResult] = useState<{ hashtags: any[]; recommendedCombination: string }>({ hashtags: [], recommendedCombination: '' });
+  const [result, setResult] = useState<HashtagResult>({ hashtags: [], recommendedCombination: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { copied, copy } = useClipboard();
@@ -147,15 +158,16 @@ export const HashtagGenerator = () => {
 
       const data = await res.json();
       setResult(data.data);
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
   // Split hashtags by volume tier
-  const byVolume = (volume: string) => result.hashtags?.filter((h: any) => h.volume === volume) || [];
+  const byVolume = (volume: 'high' | 'medium' | 'niche') => result.hashtags?.filter((h: Hashtag) => h.volume === volume) || [];
 
   return (
     <GeneratorLayout
@@ -297,7 +309,7 @@ export const HashtagGenerator = () => {
                 </p>
                 <div className="space-y-5">
                   {volumeSections.map(section => {
-                    const tags = byVolume(section.key);
+                    const tags = byVolume(section.key as 'high' | 'medium' | 'niche');
                     if (!tags.length) return null;
                     return (
                       <div key={section.key}>

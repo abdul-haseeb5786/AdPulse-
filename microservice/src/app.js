@@ -19,8 +19,10 @@ app.use(requestId);
 app.use(logger);
 
 // Standard Middlewares
-app.use(cors());
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Rate Limiter: 100 requests per minute per IP
 const apiLimiter = rateLimit({

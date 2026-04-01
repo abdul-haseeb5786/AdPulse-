@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const { startAlertEngine, seedDefaultRules } = require('./services/alertEngine');
@@ -13,25 +14,40 @@ const authRoutes = require('./routes/auth');
 const campaignRoutes = require('./routes/campaigns');
 const alertRoutes = require('./routes/alerts');
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors()); // Allow all origins for development
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Socket.io connection logic
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error('Authentication required'));
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = decoded;
+    next();
+  } catch (err) {
+    next(new Error('Invalid token'));
+  }
+});
+
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+  console.log('Client connected:', socket.id, 'User:', socket.user?.email);
   
   socket.on('join_campaign', (campaignId) => {
     socket.join(`campaign:${campaignId}`);

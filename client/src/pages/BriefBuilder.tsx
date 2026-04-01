@@ -117,52 +117,13 @@ export const BriefBuilder: React.FC = () => {
     setIsLoading(true);
     setApiError(null);
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch(`${import.meta.env.VITE_AI_SERVICE_URL}/generate/brief`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${import.meta.env.VITE_ANTHROPIC_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": window.location.origin,
-          "X-Title": "AdPulse Brief Builder"
+          "Authorization": `Bearer ${localStorage.getItem('adpulse-token')}`
         },
-        body: JSON.stringify({
-          model: "anthropic/claude-sonnet-4.5",
-          max_tokens: 1500,
-          messages: [
-            {
-              role: "user",
-              content: `- You are a senior creative advertising strategist.
-- Generate a structured creative direction document in strictly valid JSON format based on the following brief.
-- Provide no introductory or conversational text, ONLY output valid JSON.
-
-## The Brief:
-- Client: ${briefData.clientName}
-- Industry: ${briefData.industry}
-- Website: ${briefData.website}
-- Competitors: ${briefData.competitors}
-- Objective: ${briefData.objective}
-- Target Audience: ${briefData.targetAudience}
-- Budget: ${briefData.budget}
-- Tone: ${briefData.tone}
-- Imagery Style: ${briefData.imageryStyle}
-- Color Direction: ${briefData.colorDirection}
-- Do's: ${briefData.dos}
-- Don'ts: ${briefData.donts}
-
-## Required JSON Schema:
-{
-  "campaignTitle": "string",
-  "headlines": ["string", "string", "string"],
-  "toneGuide": "string (1 paragraph)",
-  "channels": [
-    { "name": "string", "budgetPercent": number }
-  ],
-  "visualDirection": "string (1 paragraph)",
-  "keyMessages": ["string", "string", "string"]
-}`
-            }
-          ]
-        })
+        body: JSON.stringify(briefData)
       });
 
       const data = await response.json();
@@ -189,8 +150,9 @@ export const BriefBuilder: React.FC = () => {
       } catch (parseErr) {
         setApiError("AI returned unexpected format, please try again");
       }
-    } catch (err: any) {
-      setApiError("Failed to connect to API, please check your network");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to connect to API, please check your network';
+      setApiError(message);
     } finally {
       setIsLoading(false);
     }

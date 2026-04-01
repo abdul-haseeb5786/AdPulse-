@@ -1,9 +1,16 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import { getCurrentUser, isAuthenticated, logout as authLogout } from '../services/authService';
 
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
 type AuthContextType = {
-  user: any;
+  user: User | null;
   isAuth: boolean;
   isLoading: boolean;
   logout: () => void;
@@ -12,13 +19,9 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any>(getCurrentUser());
+  const [user, setUser] = useState<User | null>(getCurrentUser());
   const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated());
   const isLoading = false;
-
-  useEffect(() => {
-    // Re-verify localStorage token changes if needed in the future
-  }, []);
 
   const handleLogout = () => {
     authLogout();

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -8,10 +8,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import type { Campaign } from '../services/campaignService';
 
 type TrendChartProps = {
   activeDate: string;
-  campaigns?: any[];
+  campaigns?: Campaign[];
   isLoading?: boolean;
 };
 
@@ -42,7 +43,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export const TrendChart: React.FC<TrendChartProps> = ({ activeDate, campaigns, isLoading }) => {
+export const TrendChart = ({ activeDate }: TrendChartProps) => {
   const data = useMemo(() => {
     const days = activeDate === '7D' ? 7 : activeDate === '90D' ? 90 : 30;
     return Array.from({ length: days }, (_, i) => ({

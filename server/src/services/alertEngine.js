@@ -111,7 +111,7 @@ const startAlertEngine = (io) => {
     
     if (alerts.length > 0) {
       alerts.forEach(alert => {
-        io.emit('new_alert', alert);
+        io.to(`campaign:${alert.campaign_id}`).emit('new_alert', alert);
       });
     }
     

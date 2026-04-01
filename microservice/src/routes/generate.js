@@ -30,6 +30,8 @@ const hashtagValidation = [
   body('industry').notEmpty().trim().withMessage('industry is required'),
 ];
 
+const briefController = require('../controllers/briefController');
+
 // POST /generate/copy
 router.post('/copy', copyValidation, validate, copyController.generateAdCopy);
 
@@ -38,5 +40,8 @@ router.post('/social', socialValidation, validate, socialController.generateSoci
 
 // POST /generate/hashtags
 router.post('/hashtags', hashtagValidation, validate, hashtagController.generateHashtags);
+
+// POST /generate/brief
+router.post('/brief', briefController.generateBrief);
 
 module.exports = router;

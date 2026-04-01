@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { EditCampaignModal } from './modals/EditCampaignModal';
-import { deleteCampaign } from '../services/campaignService';
+import { deleteCampaign, type Campaign, type CampaignParams } from '../services/campaignService';
 
 type CampaignTableProps = {
-  campaigns: any[];
+  campaigns: Campaign[];
   isLoading: boolean;
   total: number;
-  onFilterChange: (params: any) => void;
+  onFilterChange: (params: CampaignParams) => void;
   onRefetch: () => void;
 };
 
@@ -27,17 +27,17 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const CampaignTable: React.FC<CampaignTableProps> = ({
+export const CampaignTable = ({
   campaigns = [],
   isLoading,
   total = 0,
   onFilterChange,
   onRefetch
-}) => {
+}: CampaignTableProps) => {
   const [sortColumn, setSortColumn] = useState('');
   const [sortAsc, setSortAsc] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [editingCampaign, setEditingCampaign] = useState<any>(null);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -62,8 +62,9 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({
       try {
         await deleteCampaign(id);
         onRefetch();
-      } catch (err: any) {
-        alert(err.message || 'Failed to delete');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to delete';
+        alert(message);
       }
     }
   };

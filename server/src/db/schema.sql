@@ -52,6 +52,8 @@ ON CONFLICT DO NOTHING;
 INSERT INTO users (email, password_hash, name, role) VALUES
   ('admin@adpulse.com', '$2a$10$placeholder_will_be_replaced', 'Admin User', 'admin')
 ON CONFLICT DO NOTHING;
+-- Note: Run node -e "require('bcryptjs').hash('changeme123',10).then(console.log)" to generate a real hash
+-- Then replace the placeholder above before deploying.
 
 -- Alert rules table
 CREATE TABLE IF NOT EXISTS alert_rules (
@@ -62,7 +64,8 @@ CREATE TABLE IF NOT EXISTS alert_rules (
   operator VARCHAR(10) NOT NULL CHECK (operator IN ('lt','gt','lte','gte')),
   threshold NUMERIC(10,4) NOT NULL,
   is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_alert_rules_campaign_metric UNIQUE (campaign_id, metric, operator)
 );
 
 -- Alert history table

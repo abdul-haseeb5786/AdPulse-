@@ -7,7 +7,7 @@ const MODEL = "anthropic/claude-sonnet-4-5";
 const headers = {
   "Authorization": "Bearer " + OPENROUTER_KEY,
   "Content-Type": "application/json",
-  "HTTP-Referer": "http://localhost:5000",
+  "HTTP-Referer": process.env.SERVICE_URL || "http://localhost:5000",
   "X-Title": "AdPulse AI Microservice"
 };
 

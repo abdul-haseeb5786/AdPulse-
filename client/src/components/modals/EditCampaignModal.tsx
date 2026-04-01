@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { updateCampaign } from '../../services/campaignService';
+import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
+import { updateCampaign, type Campaign, type UpdateCampaignPayload } from '../../services/campaignService';
 
 type EditCampaignModalProps = {
-  campaign: any;
+  campaign: Campaign;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export const EditCampaignModal: React.FC<EditCampaignModalProps> = ({
+export const EditCampaignModal = ({
   campaign,
   isOpen,
   onClose,
   onSuccess
-}) => {
-  const [formData, setFormData] = useState<any>({});
+}: EditCampaignModalProps) => {
+  const [formData, setFormData] = useState<UpdateCampaignPayload>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,9 +35,9 @@ export const EditCampaignModal: React.FC<EditCampaignModalProps> = ({
 
   if (!isOpen || !campaign) return null;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData((prev: any) => ({
+    setFormData((prev: UpdateCampaignPayload) => ({
       ...prev,
       [name]: type === 'number' ? Number(value) : value
     }));
@@ -49,8 +50,9 @@ export const EditCampaignModal: React.FC<EditCampaignModalProps> = ({
       await updateCampaign(campaign.id, formData);
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to update campaign');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update campaign';
+      setError(message);
     } finally {
       setIsLoading(false);
     }

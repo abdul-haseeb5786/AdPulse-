@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { login } from '../services/authService';
 
 export const Login = () => {
@@ -8,7 +9,7 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -16,8 +17,9 @@ export const Login = () => {
     try {
       await login(email, password);
       window.location.href = '/';
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
