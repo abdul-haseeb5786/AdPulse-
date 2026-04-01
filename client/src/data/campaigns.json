@@ -1,0 +1,12 @@
+{
+  "campaigns": [
+    {"id":"c001","name":"Summer Launch","client":"Lumiere Skincare","status":"active","budget":50000,"spend":32450,"impressions":2400000,"clicks":48000,"conversions":1200,"revenue":96000},
+    {"id":"c002","name":"Tech Refresh Q3","client":"Nova Electronics","status":"active","budget":80000,"spend":71200,"impressions":5100000,"clicks":102000,"conversions":3060,"revenue":244800},
+    {"id":"c003","name":"Back to Basics","client":"Apex Fitness","status":"paused","budget":30000,"spend":18900,"impressions":980000,"clicks":15680,"conversions":392,"revenue":19600},
+    {"id":"c004","name":"Morning Ritual","client":"Drift Coffee","status":"active","budget":20000,"spend":14300,"impressions":1200000,"clicks":30000,"conversions":750,"revenue":22500},
+    {"id":"c005","name":"Glow Series","client":"Lumiere Skincare","status":"active","budget":35000,"spend":28000,"impressions":1800000,"clicks":36000,"conversions":900,"revenue":72000},
+    {"id":"c006","name":"Holiday Prep","client":"Nova Electronics","status":"draft","budget":60000,"spend":0,"impressions":0,"clicks":0,"conversions":0,"revenue":0},
+    {"id":"c007","name":"Iron Will Campaign","client":"Apex Fitness","status":"ended","budget":25000,"spend":25000,"impressions":1500000,"clicks":22500,"conversions":562,"revenue":28100},
+    {"id":"c008","name":"Cold Brew Push","client":"Drift Coffee","status":"paused","budget":15000,"spend":9800,"impressions":720000,"clicks":14400,"conversions":288,"revenue":5760}
+  ]
+}

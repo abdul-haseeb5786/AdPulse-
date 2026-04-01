@@ -1,0 +1,29 @@
+src/components/aitools/CopyGenerator.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/aitools/CopyGenerator.tsx(21,23): error TS7031: Binding element 'text' implicitly has an 'any' type.
+src/components/aitools/CopyGenerator.tsx(47,28): error TS7006: Parameter 'text' implicitly has an 'any' type.
+src/components/aitools/CopyGenerator.tsx(56,28): error TS7006: Parameter 'text' implicitly has an 'any' type.
+src/components/aitools/CopyGenerator.tsx(94,22): error TS18047: 'response.body' is possibly 'null'.
+src/components/aitools/CopyGenerator.tsx(130,40): error TS18046: 'err' is of type 'unknown'.
+src/components/aitools/HashtagGenerator.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/aitools/HashtagGenerator.tsx(13,22): error TS7031: Binding element 'filled' implicitly has an 'any' type.
+src/components/aitools/HashtagGenerator.tsx(13,30): error TS7031: Binding element 'color' implicitly has an 'any' type.
+src/components/aitools/HashtagGenerator.tsx(52,24): error TS7006: Parameter 'score' implicitly has an 'any' type.
+src/components/aitools/HashtagGenerator.tsx(59,23): error TS7031: Binding element 'tag' implicitly has an 'any' type.
+src/components/aitools/HashtagGenerator.tsx(151,16): error TS18046: 'err' is of type 'unknown'.
+src/components/aitools/HashtagGenerator.tsx(158,21): error TS7006: Parameter 'volume' implicitly has an 'any' type.
+src/components/aitools/HashtagGenerator.tsx(158,63): error TS2339: Property 'volume' does not exist on type 'never'.
+src/components/aitools/SocialGenerator.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/aitools/SocialGenerator.tsx(15,23): error TS6133: 'i' is declared but its value is never read.
+src/components/aitools/SocialGenerator.tsx(15,25): error TS7031: Binding element 'i' implicitly has an 'any' type.
+src/components/aitools/SocialGenerator.tsx(33,24): error TS7031: Binding element 'caption' implicitly has an 'any' type.
+src/components/aitools/SocialGenerator.tsx(33,33): error TS7031: Binding element 'index' implicitly has an 'any' type.
+src/components/aitools/SocialGenerator.tsx(33,40): error TS7031: Binding element 'platform' implicitly has an 'any' type.
+src/components/aitools/SocialGenerator.tsx(118,16): error TS18046: 'err' is of type 'unknown'.
+src/components/aitools/SocialGenerator.tsx(258,30): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/AITools.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/AITools.tsx(16,11): error TS2339: Property 'onMenuToggle' does not exist on type 'unknown'.
+src/pages/AITools.tsx(16,25): error TS2339: Property 'showToast' does not exist on type 'unknown'.
+src/services/authService.ts(3,29): error TS7006: Parameter 'email' implicitly has an 'any' type.
+src/services/authService.ts(3,36): error TS7006: Parameter 'password' implicitly has an 'any' type.
+src/services/authService.ts(5,46): error TS2339: Property 'token' does not exist on type 'AxiosResponse<any, any, {}>'.
+src/services/authService.ts(6,60): error TS2339: Property 'user' does not exist on type 'AxiosResponse<any, any, {}>'.

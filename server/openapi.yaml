@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: AdPulse Campaign API
+  version: 1.0.0
+  description: REST API for managing advertising campaigns
+
+servers:
+  - url: http://localhost:4000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Campaign:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        client_id: { type: string, format: uuid }
+        client_name: { type: string }
+        status: { type: string, enum: [active, paused, ended, draft] }
+        budget: { type: number }
+        spend: { type: number }
+        impressions: { type: integer }
+        clicks: { type: integer }
+        conversions: { type: integer }
+        ctr: { type: number, description: Click-through rate percentage }
+        roas: { type: number, description: Return on ad spend }
+        created_at: { type: string, format: date-time }
+
+paths:
+  /auth/login:
+    post:
+      summary: Login and get JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, example: admin@adpulse.com }
+                password: { type: string, example: password123 }
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { type: object }
+        401:
+          description: Invalid credentials
+
+  /campaigns:
+    get:
+      summary: List all campaigns
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [active, paused, ended, draft] }
+        - in: query
+          name: sort
+          schema: { type: string, enum: [spend, impressions, clicks, budget, created_at] }
+        - in: query
+          name: order
+          schema: { type: string, enum: [asc, desc] }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 10 }
+      responses:
+        200:
+          description: List of campaigns
+        401:
+          description: Unauthorized
+    post:
+      summary: Create new campaign
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, client_id, budget]
+              properties:
+                name: { type: string }
+                client_id: { type: string, format: uuid }
+                budget: { type: number, minimum: 1 }
+                status: { type: string, enum: [active, paused, ended, draft] }
+      responses:
+        201:
+          description: Campaign created
+        422:
+          description: Validation error
+
+  /campaigns/{id}:
+    get:
+      summary: Get single campaign
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        200:
+          description: Campaign details
+        404:
+          description: Not found
+    put:
+      summary: Update campaign
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        200:
+          description: Updated campaign
+        404:
+          description: Not found
+    delete:
+      summary: Soft delete campaign
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        200:
+          description: Campaign soft deleted
+        404:
+          description: Not found
