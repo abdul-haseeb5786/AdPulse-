@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 import { Toast } from './Toast';
 
-export const Layout: React.FC = () => {
+export const Layout = () => {
   const [activeClient, setActiveClient] = useState<string>('All Clients');
   const { isOpen, toggle, close } = useSidebar();
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'info' } | null>(null);
