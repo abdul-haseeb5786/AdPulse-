@@ -15,8 +15,12 @@ const auth = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    console.error('JWT Verification Error:', err.message);
-    res.status(401).json({ error: 'Invalid or expired token' });
+    if (err.name === 'TokenExpiredError') {
+      console.warn('[AUTH] Token expired:', err.expiredAt);
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    console.error('[AUTH] JWT Verification Failed:', err.message, '| Secret used snippet:', process.env.JWT_SECRET?.substring(0, 4) + '...');
+    res.status(401).json({ error: 'Invalid token' });
   }
 };
 
