@@ -47,11 +47,15 @@ async function generateCompletion(systemPrompt, userPrompt, maxTokens = 800) {
 /**
  * Streaming completion call using OpenRouter SSE
  */
-async function generateStream(systemPrompt, userPrompt, res, maxTokens = 1000) {
+async function generateStream(systemPrompt, userPrompt, res) {
+  const maxTokens = process.env.NODE_ENV === 'production'
+    ? 800 : 1000
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
+  res.setHeader('X-Vercel-Skip-Proxy-Response', '1')
 
   try {
     const response = await fetch(OPENROUTER_BASE + "/chat/completions", {

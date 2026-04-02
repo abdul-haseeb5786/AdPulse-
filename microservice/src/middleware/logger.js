@@ -29,7 +29,13 @@ const logger = (req, res, next) => {
 
   const logEntryReq = JSON.stringify(requestLog) + '\n';
   console.log(logEntryReq.trim());
-  fs.appendFileSync(logFile, logEntryReq);
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      fs.appendFileSync(logFile, logEntryReq);
+    } catch (e) {
+      // ignore file write errors in serverless
+    }
+  }
 
   // Intercept completion to log Response
   res.on('finish', () => {
@@ -45,7 +51,13 @@ const logger = (req, res, next) => {
 
     const logEntryRes = JSON.stringify(responseLog) + '\n';
     console.log(logEntryRes.trim());
-    fs.appendFileSync(logFile, logEntryRes);
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        fs.appendFileSync(logFile, logEntryRes);
+      } catch (e) {
+        // ignore file write errors in serverless
+      }
+    }
   });
 
   next();

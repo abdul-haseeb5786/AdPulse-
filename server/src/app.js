@@ -29,40 +29,48 @@ const io = new Server(httpServer, {
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean)
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('CORS not allowed'))
+    }
+  },
+  credentials: true
+}))
+
 app.use(express.json());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// Socket.io connection logic
-io.use((socket, next) => {
-  const token = socket.handshake.auth?.token;
-  if (!token) return next(new Error('Authentication required'));
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = decoded;
-    next();
-  } catch (err) {
-    next(new Error('Invalid token'));
-  }
-});
+if (process.env.NODE_ENV !== 'production') {
+  const io = new Server(httpServer, {
+    cors: { origin: '*', methods: ['GET', 'POST'] }
+  })
 
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id, 'User:', socket.user?.email);
-  
-  socket.on('join_campaign', (campaignId) => {
-    socket.join(`campaign:${campaignId}`);
-    console.log(`${socket.id} joined campaign room: ${campaignId}`);
-  });
-  
-  socket.on('leave_campaign', (campaignId) => {
-    socket.leave(`campaign:${campaignId}`);
-    console.log(`${socket.id} left campaign room: ${campaignId}`);
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
-});
+  io.on('connection', (socket) => {
+    console.log('Client connected:', socket.id)
+    socket.on('join_campaign', (campaignId) => {
+      socket.join('campaign:' + campaignId)
+    })
+    socket.on('disconnect', () => {
+      console.log('Client disconnected:', socket.id)
+    })
+  })
+
+  if (require.main === module) {
+    httpServer.listen(PORT, async () => {
+      console.log('AdPulse API running on port ' + PORT)
+      await seedDefaultRules()
+      startAlertEngine(io)
+    })
+  }
+}
 
 // Routes
 app.get('/health', (req, res) => {
@@ -76,16 +84,4 @@ app.use('/alerts', alertRoutes);
 // Error Handling (Must be last)
 app.use(errorHandler);
 
-httpServer.listen(PORT, async () => {
-  console.log(`AdPulse API running on port ${PORT}`);
-  
-  // Initialize Alert Engine
-  try {
-    await seedDefaultRules();
-    startAlertEngine(io);
-  } catch (err) {
-    console.error('Failed to initialize Alert Engine:', err);
-  }
-});
-
-module.exports = { app, httpServer, io };
+module.exports = app

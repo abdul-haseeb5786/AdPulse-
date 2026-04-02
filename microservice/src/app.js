@@ -19,8 +19,20 @@ app.use(requestId);
 app.use(logger);
 
 // Standard Middlewares
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean)
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('CORS not allowed'))
+    }
+  }
+}))
 app.use(express.json());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
@@ -48,8 +60,10 @@ app.use('/health', healthRoutes);
 // Error Handling (Must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`AI Microservice running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log('AI Microservice running on port ' + PORT)
+  })
+}
 
-module.exports = app;
+module.exports = app
